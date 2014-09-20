@@ -37,6 +37,9 @@ Header Notes:
 	To Do: -Add ability to send float data.
 			-Add read_uart functions
 			-Add return values to indicate successful/failed transmissions
+8/26/2014
+	-Added memset to set strings to all 0x00 before use.  An issue was occuring with old data
+	being resent.
 */
 
 //Defines
@@ -45,6 +48,7 @@ Header Notes:
 //Includes
 #include <stdlib.h>								//Contains the itoa function
 #include <avr/io.h>
+#include <string.h>
 
 //Declarations
 void init_uart(void);
@@ -56,6 +60,8 @@ void send_uart_uint16(uint16_t);
 void send_uart_binary8(uint8_t);
 void send_uart_binary16(uint16_t);
 void send_uart_string(char*, int);
+void send_uart_uint32(uint32_t value);
+void send_uart_int32(int32_t value);
 int8_t receive_uart(void);
 
 //Variable Declarations
@@ -157,6 +163,8 @@ void send_uart_uint16(uint16_t value)
 ************************************************************************/
 void send_uart_int8(int8_t value)
 {
+	
+	memset(string,0x00,12);
 	itoa(value, string, 10);
 	
 	for (counter=0;counter<=3;counter++)
@@ -180,6 +188,7 @@ void send_uart_int8(int8_t value)
 ************************************************************************/
 void send_uart_uint8(uint8_t value)
 {
+	memset(string,0x00,12);
 	utoa(value, string, 10);
 	
 	for (counter=0;counter<=3;counter++)
@@ -339,9 +348,9 @@ void send_uart_uint32(uint32_t value)
 	memset(string,0x00,12);
 	
 	counter=0;
-	ltoa(value, string, 11);
+	ltoa(value, string, 12);
 	
-	for (counter=0;counter<11;counter++)
+	for (counter=0;counter<=10;counter++)
 	{
 		if (!(string==0x00))
 		{
